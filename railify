@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 # Generate a rails app (using EDGE rails), set up a git repo for it, install GemsOnRails,
-# haml, rspec, and the rspec-haml-scaffold generator
+# haml, rspec, and make_resourceful
 #
 # USAGE: $0 some_app_name
 
