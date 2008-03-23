@@ -1,0 +1,76 @@
+#!/opt/local/bin/ruby
+
+%w( rubygems active_support optparse ostruct ).each {|l| require l}
+
+module Enumerable
+  def shuffle
+    sort_by { rand }
+  end
+end
+
+class PassGrid
+  ALPHANUMERIC = ('A'..'Z').to_a + (0..9).to_a.map(&:to_s)
+  EXTENDED     = ALPHANUMERIC + %w( + - = _ ! / < > @ # $ % ^ & * \ ; : . , )
+
+  def initialize(width, height, extended_charset = false, label = nil)
+    @rows = []
+    @width, @height = width, height
+    @label = label
+    self.characters = extended_charset
+    populate
+  end
+
+  def print
+    print_label
+    @rows.each {|row| puts row.join(@height == 1 ? "" : " ") }
+  end
+
+  private
+    def print_label
+      return if @label.nil?
+      puts @label
+      puts "=" * (2 * @width - 1)
+    end
+    def populate
+      @height.times do
+        @rows << []
+        @width.times { @rows.last << characters.shuffle.last.gsub(/\s+/, "") }
+      end
+    end
+    def characters=(charset)
+      @charset = ALPHANUMERIC
+      return if charset.blank?
+
+      @charset += case charset
+        when String then charset.split("").uniq
+        when Enumerable then charset
+        else EXTENDED
+      end
+    end
+    def characters
+      @charset.map do |char|
+        rand(2).zero? ? char.downcase : char.upcase
+      end
+    end
+end
+
+if $0 == __FILE__
+  options = { :extended => false, :width => 10, :height => 10, :label => nil, :help => false }
+
+  opts = OptionParser.new do |opts|
+    opts.on("-e [CHARSET]", "--extended [CHARSET]", "Extended character set")         {|c| options[:extended] = c || true }
+    opts.on("-w WIDTH", "--width WIDTH",  /\d+/, "Width of the grid (default 10)")    {|w| options[:width] = w.to_i }
+    opts.on("-h HEIGHT", "--height HEIGHT", /\d+/, "Height of the grid (default 10)") {|h| options[:height] = h.to_i }
+    opts.on("-l LABEL", "--label LABEL", "Label for the grid")                        {|l| options[:label] = l }
+    opts.on_tail("--help", "Show this usage statement")                               { raise }
+  end
+
+  begin
+    opts.parse!(ARGV)
+  rescue Exception => e
+    puts opts
+    exit
+  end
+
+  PassGrid.new(options[:width], options[:height], options[:extended], options[:label]).print
+end
