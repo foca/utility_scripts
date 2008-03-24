@@ -1,15 +1,9 @@
-#!/opt/local/bin/ruby
+#!/usr/bin/env ruby
 
-%w( rubygems active_support optparse ostruct ).each {|l| require l}
-
-module Enumerable
-  def shuffle
-    sort_by { rand }
-  end
-end
+%w( rubygems optparse ).each &method(:require)
 
 class PassGrid
-  ALPHANUMERIC = ('A'..'Z').to_a + (0..9).to_a.map(&:to_s)
+  ALPHANUMERIC = ('A'..'Z').to_a + (0..9).to_a.map {|i| i.to_s }
   EXTENDED     = ALPHANUMERIC + %w( + - = _ ! / < > @ # $ % ^ & * \ ; : . , )
 
   def initialize(width, height, extended_charset = false, label = nil)
@@ -34,12 +28,12 @@ class PassGrid
     def populate
       @height.times do
         @rows << []
-        @width.times { @rows.last << characters.shuffle.last.gsub(/\s+/, "") }
+        @width.times { @rows.last << characters.sort_by { rand }.last.gsub(/\s+/, "") }
       end
     end
     def characters=(charset)
       @charset = ALPHANUMERIC
-      return if charset.blank?
+      return if charset.nil? || charset.empty?
 
       @charset += case charset
         when String then charset.split("").uniq
