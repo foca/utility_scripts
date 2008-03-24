@@ -8,12 +8,10 @@
 # See http://github.com/foca/utility_scripts/ for the latest version
 # Released under a WTFP license (http://sam.zoy.org/wtfpl/)
 
-`export COLUMNS`
-
 RAILS_SVN_CHECKOUT = '/Users/foca/Rails/_rails'
 
 module Helpers
-  LINE = ENV["COLUMNS"] || 80
+  LINE = 80
 
   def announcing(msg)
     print msg
