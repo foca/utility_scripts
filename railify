@@ -8,10 +8,12 @@
 # See http://github.com/foca/utility_scripts/ for the latest version
 # Released under a WTFP license (http://sam.zoy.org/wtfpl/)
 
+`export COLUMNS`
+
 RAILS_SVN_CHECKOUT = '/Users/foca/Rails/_rails'
 
 module Helpers
-  LINE = 80
+  LINE = ENV["COLUMNS"] || 80
 
   def announcing(msg)
     print msg
@@ -40,9 +42,7 @@ module Helpers
   end
 
   def rake(task, args={})
-    args = args.inject("") do |list, (name, value)|
-      list << "#{name.to_s.upcase}=#{value}"
-    end
+    args = args.map {|name,value| "#{name.to_s.upcase}=#{value}"}.join(" ")
     silent "rake #{task} #{args}"
   end
 end
